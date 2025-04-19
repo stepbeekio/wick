@@ -1,6 +1,5 @@
 (ns example.routes
   (:require [clojure.tools.logging :as log]
-            [example.cave.routes :as cave-routes]
             [example.goodbye.routes :as goodbye-routes]
             [example.hello.routes :as hello-routes]
             [example.static.routes :as static-routes]
@@ -12,7 +11,6 @@
   [system]
   [""
    (static-routes/routes system)
-   (cave-routes/routes system)
    (hello-routes/routes system)
    (goodbye-routes/routes system)])
 

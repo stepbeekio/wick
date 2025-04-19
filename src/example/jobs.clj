@@ -1,7 +1,6 @@
 (ns example.jobs
   (:require [cheshire.core :as cheshire]
             [clojure.tools.logging :as log]
-            [example.cave.jobs :as cave-jobs]
             [proletarian.protocols :as protocols]
             [proletarian.worker :as-alias worker]))
 
@@ -31,7 +30,7 @@
   []
   (merge
    {}
-   (cave-jobs/handlers)))
+   ))
 
 (defn process-job
   [system job-type payload]

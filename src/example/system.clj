@@ -4,7 +4,8 @@
             [next.jdbc.connection :as connection]
             [proletarian.worker :as worker]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.session.cookie :as session-cookie])
+            [ring.middleware.session.cookie :as session-cookie]
+            [example.database.migrations :as db-migrations])
   (:import (com.zaxxer.hikari HikariDataSource)
            (io.github.cdimascio.dotenv Dotenv)
            (org.eclipse.jetty.server Server)))
@@ -19,13 +20,20 @@
   []
   (session-cookie/cookie-store))
 
+(defn db-config [env]
+  (let [username (Dotenv/.get env "POSTGRES_USERNAME")
+        jdbcUrl (Dotenv/.get env "POSTGRES_URL")
+        password (Dotenv/.get env "POSTGRES_PASSWORD")
+        config     {:jdbcUrl jdbcUrl
+                    :username username
+                    :password password}]
+    config))
+
 (defn start-db
   [{::keys [env]}]
-  (connection/->pool HikariDataSource
-                     {:dbtype "postgres"
-                      :dbname "postgres"
-                      :username (Dotenv/.get env "POSTGRES_USERNAME")
-                      :password (Dotenv/.get env "POSTGRES_PASSWORD")}))
+  (let [config (db-config env)]
+    (db-migrations/run-migrations config)
+    (connection/->pool HikariDataSource config)))
 
 (defn stop-db
   [db]

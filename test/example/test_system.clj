@@ -1,10 +1,8 @@
 (ns example.test-system
   (:require [clojure.java.io :as io]
-            [next.jdbc :as jdbc])
+            [next.jdbc :as jdbc]
+            [example.database.migrations :as migrations])
   (:import (java.util Properties)
-           (org.apache.ibatis.migration DataSourceConnectionProvider FileMigrationLoader)
-           (org.apache.ibatis.migration.operations UpOperation)
-           (org.apache.ibatis.migration.options DatabaseOperationOption)
            (org.testcontainers.containers PostgreSQLContainer)
            (org.testcontainers.containers.wait.strategy Wait)
            (org.testcontainers.utility DockerImageName)))
@@ -43,30 +41,10 @@
                      "&password="
                      (PostgreSQLContainer/.getPassword container))})))
 
-(defn ^:private run-migrations
-  [db]
-  (let [scripts-dir (io/file "migrations/scripts")
-        env-properties (io/file "migrations/environments/development.properties")]
-    (with-open [env-properties-stream (io/input-stream env-properties)]
-      (.operate (UpOperation.)
-                (DataSourceConnectionProvider. db)
-                (FileMigrationLoader.
-                 scripts-dir
-                 "UTF-8"
-                 (doto (Properties.)
-                   (.load env-properties-stream)))
-                (doto (DatabaseOperationOption.)
-                  (.setSendFullScript true))
-                nil))))
-
-(defonce ^:private migrations-delay
-  (delay (run-migrations (get-test-db))))
-
 (def ^:private test-counter (atom 0))
 
 (defn with-test-db
   [callback]
-  @migrations-delay
   (let [test-database-name (str "test_" (swap! test-counter inc))
         container          @pg-test-container-delay
         db                 (get-test-db)]
@@ -77,19 +55,20 @@
               (PostgreSQLContainer/.getDatabaseName container))])
 
     (try
-      (let [db (jdbc/get-datasource
+      (let [username (PostgreSQLContainer/.getUsername container)
+            password (PostgreSQLContainer/.getPassword container)
+            jdbcUrl (str "jdbc:postgresql://"
+                         (PostgreSQLContainer/.getHost container)
+                         ":"
+                         (PostgreSQLContainer/.getMappedPort container
+                                                             PostgreSQLContainer/POSTGRESQL_PORT)
+                         "/"
+                         test-database-name
+                         )
+            db (jdbc/get-datasource
                 {:dbtype   "postgresql"
-                 :jdbcUrl  (str "jdbc:postgresql://"
-                                (PostgreSQLContainer/.getHost container)
-                                ":"
-                                (PostgreSQLContainer/.getMappedPort container
-                                                                    PostgreSQLContainer/POSTGRESQL_PORT)
-                                "/"
-                                test-database-name
-                                "?user="
-                                (PostgreSQLContainer/.getUsername container)
-                                "&password="
-                                (PostgreSQLContainer/.getPassword container))})]
+                 :jdbcUrl (str jdbcUrl "?user=" username "&password=" password) })]
+        (migrations/run-migrations {:jdbcUrl jdbcUrl :username username :password password})
         (callback db))
       (finally
         (jdbc/execute! db

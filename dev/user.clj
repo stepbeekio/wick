@@ -3,6 +3,8 @@
 
 (def system nil)
 
+(add-tap prn)
+
 (defn start-system!
   []
   (if system
