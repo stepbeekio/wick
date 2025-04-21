@@ -12,7 +12,13 @@
   [""
    (static-routes/routes system)
    (hello-routes/routes system)
-   (goodbye-routes/routes system)])
+   (goodbye-routes/routes system)
+   [["/assets/*" (reitit-ring/create-resource-handler)]]])
+
+(comment
+  (require '[clojure.java.io :as io])
+  (io/resource "assets/js/main.js"))
+
 
 (defn not-found-handler
   [_request]

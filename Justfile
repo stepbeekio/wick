@@ -21,3 +21,6 @@ test:
 
 outdated:
     clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core
+
+build-fe:
+    npx shadow-cljs release frontend

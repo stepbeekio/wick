@@ -2,3 +2,8 @@
 .cpcache
 .clj-kondo/.cache
 data
+.jj
+.shadow-cljs
+node_modules
+assets
+

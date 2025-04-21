@@ -6,6 +6,8 @@
    [:head
     [:title title]
     [:meta {:name "viewport"
-            :content "width=device-width, initial-scale=1.0"}]]
+            :content "width=device-width, initial-scale=1.0"}]
+    [:script {:src "/assets/js/main.js"}]
+    ]
    [:body
     body]])

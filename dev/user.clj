@@ -1,5 +1,8 @@
 (ns user
-  (:require [example.system :as system])
+  (:require [example.system :as system]
+            [shadow.cljs.devtools.api :as shadow]
+            [shadow.cljs.devtools.server :as shadow-server]
+            [example.routes :as routes])
   (:import [java.io BufferedReader InputStreamReader]))
 
 (def system nil)
@@ -30,10 +33,13 @@
      :stderr stderr}))
 
 (defn start-system!
+  {:shadow/requires-server true}
   []
   (if system
     (println "Already Started")
     (do
+      (shadow-server/start!) 
+      (shadow/watch :frontend)
       (run-docker-compose "up" "-d")
       (alter-var-root #'system (constantly (system/start-system))))))
 
@@ -65,3 +71,5 @@
   (::system/cookie-store system))
 
 (comment (restart-system!))
+
+(comment (routes/routes system ))
