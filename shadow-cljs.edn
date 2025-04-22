@@ -5,5 +5,5 @@
    :modules {:main {:init-fn example.frontend.app/init}}
    :devtools {:watch-dir "public"}
    :output-dir "assets/public/js"
-   :asset-path "/assets"
+   :asset-path "/assets/js"
    }}}

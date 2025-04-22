@@ -1,4 +1,6 @@
-(ns example.frontend.app)
+(ns example.frontend.app
+  (:require [example.frontend.stimulus.core :as stimulus]))
 
 (defn init []
-  (println "Hello World!"))
+  (stimulus/init)
+  (println "With stimulus"))
