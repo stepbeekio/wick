@@ -1,8 +1,16 @@
 {
+  "scripts": {
+    "css:build": "tailwindcss -i ./res/css/input.css -o ./assets/public/css/main.css"
+  },
   "devDependencies": {
-    "shadow-cljs": "^2.28.23"
+    "@tailwindcss/cli": "^4.1.4",
+    "autoprefixer": "^10.4.21",
+    "postcss-cli": "^11.0.1",
+    "shadow-cljs": "^2.28.23",
+    "tailwindcss": "^4.1.4"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2"
   }
 }
+

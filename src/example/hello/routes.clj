@@ -6,6 +6,7 @@
 
 (defn hello-handler
   [{::system/keys [db]} _request]
+  (tap> _request)
   (let [{:keys [planet]} (jdbc/execute-one!
                           db
                           ["SELECT 'earth' as planet"])]
@@ -13,14 +14,15 @@
      :headers {"Content-Type" "text/html"}
      :body
      (page-html/render
-      (page-html/view {:body [:h1 {:stimulus/controller "greet"} (str "Hello, " planet)
+      (page-html/view {:body [:h1.text-red-500 {:stimulus/controller "greet"} (str "Hello, " planet)
                               [:form
                                [:input {:type "text" :stimulus/target {:target "name" :controller "greet"}
                                         :stimulus/action (page-html/s-> "input" "greet" "updateName") :placeholder "My name..." :required true}]
-                               [:button {:type "button" :stimulus/action (page-html/s-> "click" "greet" "greet")} "Greet"]]
+                               [:button.text-red-50 {:type "button" :stimulus/action (page-html/s-> "click" "greet" "greet")} "Greet"]]
                               [:p {:stimulus/target {:target "output" :controller "greet"}}]]}))}))
 
 (comment (:stimulus/action (page-html/s-> "click" "greet" "updateName")))
+
 
 (def desired
   [:div {:stimulus/controller "greet"}

@@ -35,6 +35,8 @@
                               lambdaisland/kaocha {:mvn/version "1.91.1392"}
                               ;; Shadow cljs to compile front-end assets
                               thheller/shadow-cljs {:mvn/version "2.28.18"}
+                              ;; Watch for file changes to power css build
+                              com.nextjournal/beholder {:mvn/version "1.0.2"}
                               ;; Run Postgres in Tests
                               org.testcontainers/postgresql {:mvn/version "1.20.3"}
                              }} 

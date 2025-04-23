@@ -1,13 +1,35 @@
 (ns user
   (:require [example.system :as system]
+            [nextjournal.beholder :as beholder]
+            [clojure.tools.logging :as log]
             [shadow.cljs.devtools.api :as shadow]
             [shadow.cljs.devtools.server :as shadow-server]
-            [example.routes :as routes])
+            [example.routes :as routes]
+            [clojure.java.shell :refer [sh]])
   (:import [java.io BufferedReader InputStreamReader]))
 
-(def system nil)
+;; CSS building functionality
+(defonce watch-state (atom nil))
 
-(add-tap prn)
+(defn build-css! []
+  "Builds CSS using NPM on the command line"
+  (let [css-result (sh "npm" "run" "css:build")]
+    (tap> css-result)))
+
+(defn watch-css []
+  "Watches for any file change and runs the tailwind build as a result. The downside to this approach is that sending a single function to the REPL might result in tailwind build not being triggered. Maybe there's something that could be a result of emacs buffer files that could help here?"
+  (when @watch-state
+    (beholder/stop @watch-state)
+    (reset! watch-state nil))
+
+  (reset! watch-state
+          (beholder/watch (fn [ctx] (tap> ctx) (build-css!))
+                          "src" "dev" "res" "package.json")))
+
+
+(comment (watch-css))
+
+(def system nil)
 
 (defn run-docker-compose
   "Runs docker-compose with the given arguments in the project directory.
@@ -38,9 +60,10 @@
   (if system
     (println "Already Started")
     (do
-      (shadow-server/start!) 
+      (shadow-server/start!)
       (shadow/watch :frontend)
       (run-docker-compose "up" "-d")
+      (watch-css)
       (alter-var-root #'system (constantly (system/start-system))))))
 
 (defn stop-system!
@@ -71,5 +94,5 @@
   (::system/cookie-store system))
 
 (comment (restart-system!))
-
-(comment (routes/routes system ))
+(comment (identity @watch-state))
+(comment (routes/routes system))

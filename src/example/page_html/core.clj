@@ -10,7 +10,9 @@
     [:title title]
     [:meta {:name "viewport"
             :content "width=device-width, initial-scale=1.0"}]
-    [:script {:src "/assets/js/main.js"}]]
+
+    [:script {:src "/assets/js/main.js"}]
+    [:link {:href "assets/css/main.css" :rel "stylesheet"}]]
    [:body
     body]])
 
