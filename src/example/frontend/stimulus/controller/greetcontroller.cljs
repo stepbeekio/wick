@@ -13,15 +13,13 @@
            (println "Greeting!"))
 
   (updateName [this input]
-              (let [nameValue (.-nameValue this)
-                    name (-> this
+              (let [name (-> this
                              (.-nameTarget)
-                             (.-value))
-                    outputText (-> this
-                                   (.-outputTarget)
-                                   (.-innerText))]
-                (set! nameValue name)
-                (set! outputText nameValue)))
+                             (.-value))]
+                (set! (.-nameValue this) name)
+                (set! (-> this
+                          (.-outputTarget)
+                          (.-innerText)) name)))
 
   (greet [this]
          (println (str "Hello " (.-nameValue this)))))

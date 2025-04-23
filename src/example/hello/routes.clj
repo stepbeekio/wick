@@ -11,15 +11,21 @@
                           ["SELECT 'earth' as planet"])]
     {:status 200
      :headers {"Content-Type" "text/html"}
-     :body (str
-            (hiccup/html
-             (page-html/view
-              :body [:h1 {:data-controller "greet"} (str "Hello, " planet)
-                     [:form
-                      [:input {:type "text" :data-greet-target "name" :data-action "input->greet#updateName" :placeholder "My name..." :required true}]
-                      [:button {:type "button" :data-action "click->greet#greet"} "Greet"]]
-                     [:p {:data-greet-target "output"}]
-                     ])))}))
+     :body
+     (page-html/render
+      (page-html/view {:body [:h1 {:stimulus/controller "greet"} (str "Hello, " planet)
+                              [:form
+                               [:input {:type "text" :stimulus/target {:target "name" :controller "greet"}
+                                        :stimulus/action (page-html/s-> "input" "greet" "updateName") :placeholder "My name..." :required true}]
+                               [:button {:type "button" :stimulus/action (page-html/s-> "click" "greet" "greet")} "Greet"]]
+                              [:p {:stimulus/target {:target "output" :controller "greet"}}]]}))}))
+
+(comment (:stimulus/action (page-html/s-> "click" "greet" "updateName")))
+
+(def desired
+  [:div {:stimulus/controller "greet"}
+   [:p {:stimulus/greet-target "output"}]
+   [:button {:stimulus/greet-action {:event "input" :method "update"}}]])
 
 (defn routes
   [system]
