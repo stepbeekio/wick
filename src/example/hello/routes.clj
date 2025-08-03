@@ -14,7 +14,7 @@
      :headers {"Content-Type" "text/html"}
      :body
      (page-html/render
-      (page-html/view {:body [:h1.text-red-500 {:stimulus/controller "greet"} (str "Hello, " planet)
+      (page-html/view {:body [:h1.text-red-500 {:stimulus/controller "greet"} (str  "Hello, " planet)
                               [:form
                                [:input {:type "text" :stimulus/target {:target "name" :controller "greet"}
                                         :stimulus/action (page-html/s-> "input" "greet" "updateName") :placeholder "My name..." :required true}]

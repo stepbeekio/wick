@@ -23,6 +23,7 @@
         org.flywaydb/flyway-database-postgresql {:mvn/version "11.7.2"}
         ;; HTTP Middleware
         ring/ring-defaults {:mvn/version "0.5.0"}
+        ring-refresh/ring-refresh {:mvn/version "0.2.0"}  ;; Added for auto browser refresh
         ;; Background Jobs
         msolli/proletarian {:mvn/version "1.0.86-alpha"}
         ;; JSON Reading and Writing

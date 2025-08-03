@@ -11,12 +11,15 @@
    [ring.middleware.nested-params :refer [wrap-nested-params]]
    [ring.middleware.not-modified :refer [wrap-not-modified]]
    [ring.middleware.params :refer [wrap-params]]
+   [ring.middleware.refresh :refer [wrap-refresh]]
    [ring.middleware.session :refer [wrap-session]]
    [ring.middleware.x-headers :as x]))
 
 (defn standard-html-route-middleware
   [{::system/keys [cookie-store]}]
-  [;; Prevents "media type confusion" attacks
+  [;; Auto-refresh in development
+   wrap-refresh
+   ;; Prevents "media type confusion" attacks
    #(x/wrap-content-type-options % :nosniff)
    ;; Prevents "clickjacking" attacks
    #(x/wrap-frame-options % :sameorigin)
