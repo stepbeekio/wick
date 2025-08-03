@@ -1,5 +1,6 @@
 (ns example.middleware
   (:require
+   [example.system :as-alias system]
    [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
    [ring.middleware.content-type :refer [wrap-content-type]]
    [ring.middleware.cookies :refer [wrap-cookies]]
@@ -11,8 +12,7 @@
    [ring.middleware.not-modified :refer [wrap-not-modified]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.middleware.session :refer [wrap-session]]
-   [ring.middleware.x-headers :as x]
-   [example.system :as-alias system]))
+   [ring.middleware.x-headers :as x]))
 
 (defn standard-html-route-middleware
   [{::system/keys [cookie-store]}]

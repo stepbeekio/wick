@@ -1,11 +1,11 @@
 (ns example.system
-  (:require [example.jobs :as jobs]
+  (:require [example.database.migrations :as db-migrations]
+            [example.jobs :as jobs]
             [example.routes :as routes]
             [next.jdbc.connection :as connection]
             [proletarian.worker :as worker]
             [ring.adapter.jetty :as jetty]
-            [ring.middleware.session.cookie :as session-cookie]
-            [example.database.migrations :as db-migrations])
+            [ring.middleware.session.cookie :as session-cookie])
   (:import (com.zaxxer.hikari HikariDataSource)
            (io.github.cdimascio.dotenv Dotenv)
            (org.eclipse.jetty.server Server)))

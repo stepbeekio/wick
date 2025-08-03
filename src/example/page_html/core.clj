@@ -1,7 +1,7 @@
 (ns example.page-html.core
-  (:require [hiccup2.core :as hiccup]
+  (:require [clojure.walk :as w]
             [hiccup.util :as hiccup-util]
-            [clojure.walk :as w]))
+            [hiccup2.core :as hiccup]))
 
 (defn view [& {:keys [body title]
                :or {title "The Website"}}]

@@ -1,11 +1,11 @@
 (ns user
-  (:require [example.system :as system]
-            [nextjournal.beholder :as beholder]
+  (:require [clojure.java.shell :refer [sh]]
             [clojure.tools.logging :as log]
-            [shadow.cljs.devtools.api :as shadow]
-            [shadow.cljs.devtools.server :as shadow-server]
             [example.routes :as routes]
-            [clojure.java.shell :refer [sh]])
+            [example.system :as system]
+            [nextjournal.beholder :as beholder]
+            [shadow.cljs.devtools.api :as shadow]
+            [shadow.cljs.devtools.server :as shadow-server])
   (:import [java.io BufferedReader InputStreamReader]))
 
 ;; CSS building functionality
@@ -25,7 +25,6 @@
   (reset! watch-state
           (beholder/watch (fn [ctx] (tap> ctx) (build-css!))
                           "src" "dev" "res" "package.json")))
-
 
 (comment (watch-css))
 

@@ -1,7 +1,7 @@
 (ns example.test-system
   (:require [clojure.java.io :as io]
-            [next.jdbc :as jdbc]
-            [example.database.migrations :as migrations])
+            [example.database.migrations :as migrations]
+            [next.jdbc :as jdbc])
   (:import (java.util Properties)
            (org.testcontainers.containers PostgreSQLContainer)
            (org.testcontainers.containers.wait.strategy Wait)
@@ -63,11 +63,10 @@
                          (PostgreSQLContainer/.getMappedPort container
                                                              PostgreSQLContainer/POSTGRESQL_PORT)
                          "/"
-                         test-database-name
-                         )
+                         test-database-name)
             db (jdbc/get-datasource
                 {:dbtype   "postgresql"
-                 :jdbcUrl (str jdbcUrl "?user=" username "&password=" password) })]
+                 :jdbcUrl (str jdbcUrl "?user=" username "&password=" password)})]
         (migrations/run-migrations {:jdbcUrl jdbcUrl :username username :password password})
         (callback db))
       (finally

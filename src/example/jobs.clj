@@ -29,8 +29,7 @@
 (defn handlers
   []
   (merge
-   {}
-   ))
+   {}))
 
 (defn process-job
   [system job-type payload]

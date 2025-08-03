@@ -39,7 +39,12 @@
                               com.nextjournal/beholder {:mvn/version "1.0.2"}
                               ;; Run Postgres in Tests
                               org.testcontainers/postgresql {:mvn/version "1.20.3"}
-                             }} 
+                             }
+
+                                   :jvm-opts ["-Djdk.attach.allowAttachSelf"]
+                                  :main-opts ["-m" "nrepl.cmdline" "--port" "7888"]
+                 }
+
 
 
            :format {:deps {dev.weavejester/cljfmt {:mvn/version "0.13.0"}}}

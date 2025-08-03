@@ -19,7 +19,6 @@
   (require '[clojure.java.io :as io])
   (io/resource "assets/js/main.js"))
 
-
 (defn not-found-handler
   [_request]
   {:status 404

@@ -23,7 +23,6 @@
 
 (comment (:stimulus/action (page-html/s-> "click" "greet" "updateName")))
 
-
 (def desired
   [:div {:stimulus/controller "greet"}
    [:p {:stimulus/greet-target "output"}]
