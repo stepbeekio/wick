@@ -20,14 +20,36 @@
   (io/resource "assets/js/main.js"))
 
 (defn not-found-handler
-  [_request]
+  [request]
   {:status 404
-   :headers {"Content-Type" "text/html"}
+   :headers {"Content-Type" "text/html; charset=UTF-8"}
    :body (str
           (hiccup/html
            [:html
+            [:head
+             [:meta {:charset "UTF-8"}]
+             [:title "Page Not Found - Wick"]
+             [:meta {:name "viewport"
+                     :content "width=device-width, initial-scale=1.0"}]
+             [:script {:src "/assets/js/main.js"}]
+             [:link {:href "/assets/css/main.css" :rel "stylesheet"}]]
             [:body
-             [:h1 "Not Found"]]]))})
+             [:div {:class "min-h-screen bg-gray-50 flex items-center justify-center p-6"}
+              [:div {:class "max-w-md w-full bg-white rounded-lg shadow-lg border border-gray-200 p-8 text-center"}
+               [:div {:class "mb-6"}
+                [:h1 {:class "text-6xl font-bold mb-2 text-gray-800"} "404"]
+                [:div {:class "text-2xl font-semibold mb-4 text-gray-700"} "Page Not Found"]]
+               [:div {:class "mb-8 text-gray-600"}
+                [:p {:class "text-lg mb-2"} "The page you're looking for doesn't exist."]
+                [:p {:class "text-sm"}
+                 "The URL " [:code {:class "bg-gray-100 px-2 py-1 rounded text-xs text-gray-800"} (:uri request)] " could not be found."]]
+               [:div {:class "space-y-3"}
+                [:button {:onclick "window.history.back()"}
+                 :class "w-full bg-gray-100 hover:bg-gray-200 transition-colors duration-200 px-6 py-3 rounded-md font-medium text-gray-700 border border-gray-300"
+                 "← Go Back"]
+                [:a {:href "/"
+                     :class "block w-full bg-gray-800 hover:bg-gray-900 transition-colors duration-200 px-6 py-3 rounded-md font-medium text-white"}
+                 "Return Home"]]]]]]))})
 
 (defn root-handler
   ([system request]
