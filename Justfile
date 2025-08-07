@@ -17,7 +17,7 @@ lint:
     clojure -M:lint -m clj-kondo.main --lint .
 
 test:
-    clojure -M:dev -m kaocha.runner
+    clojure -M:test
 
 outdated:
     clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core

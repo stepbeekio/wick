@@ -45,7 +45,7 @@
           [:p.mb-6 "Try out the Stimulus controller integration:"]
           [:div {:stimulus/controller "greet"}
            [:div.flex.gap-4.mb-4
-            [:input.px-4.py-2.rounded.text-gray-800
+            [:input.px-4.py-2.rounded.text-gray-800.bg-white
              {:type "text"
               :stimulus/target {:target "name" :controller "greet"}
               :stimulus/action (page-html/s-> "input" "greet" "updateName")

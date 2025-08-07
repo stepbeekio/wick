@@ -15,11 +15,12 @@
   (updateName [this input]
               (let [name (-> this
                              (.-nameTarget)
-                             (.-value))]
+                             (.-value))
+                    result (if (clojure.string/blank? name) "" (str "Hello " name "!"))]
                 (set! (.-nameValue this) name)
                 (set! (-> this
                           (.-outputTarget)
-                          (.-innerText)) name)))
+                          (.-innerText)) result)))
 
   (greet [this]
          (println (str "Hello " (.-nameValue this)))))
