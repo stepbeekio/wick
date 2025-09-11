@@ -40,7 +40,8 @@
                               com.nextjournal/beholder {:mvn/version "1.0.2"}
                               ;; Run Postgres in Tests
                               org.testcontainers/postgresql {:mvn/version "1.20.3"}
-                             }
+                              ;; Mock HTTP requests for testing
+                              ring/ring-mock {:mvn/version "0.4.0"}}
 
                                    :jvm-opts ["-Djdk.attach.allowAttachSelf"]
                                   :main-opts ["-m" "nrepl.cmdline" "--port" "7888"]
@@ -50,7 +51,8 @@
 
            :test {:extra-paths ["test"]
                   :extra-deps {lambdaisland/kaocha {:mvn/version "1.91.1392"}
-                               org.testcontainers/postgresql {:mvn/version "1.20.3"}}
+                               org.testcontainers/postgresql {:mvn/version "1.20.3"}
+                               ring/ring-mock {:mvn/version "0.4.0"}}
                   :main-opts ["-m" "kaocha.runner"]}
            
            :format {:deps {dev.weavejester/cljfmt {:mvn/version "0.13.0"}}}
