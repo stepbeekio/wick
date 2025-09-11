@@ -1,4 +1,83 @@
-# Wick Project - Testing Strategy and Information
+# Wick Project - Development Guidelines
+
+## Route Refactoring Plan - Separation of Concerns
+
+### Current State
+- Database queries are directly embedded in route handlers (e.g., `hello/routes.clj`)
+- View rendering logic (Hiccup templates) is mixed with route handling
+- This makes testing difficult and violates single responsibility principle
+
+### Target Architecture
+Three-layer separation:
+1. **Routes Layer** - HTTP request/response handling only
+2. **Service Layer** - Business logic and database access
+3. **View Layer** - Hiccup template rendering
+
+### Refactoring Strategy
+
+#### Phase 1: Hello Routes (Most Complex)
+1. Create `src/example/hello/service.clj`
+   - Extract database query logic
+   - Return data maps, not HTTP responses
+   - Example: `(get-planet-info db)` returns `{:planet "earth"}`
+
+2. Create `src/example/hello/views.clj`
+   - Extract all Hiccup template logic
+   - Pure functions that take data and return Hiccup
+   - Example: `(render-hello-page {:planet "earth"})` returns Hiccup structure
+
+3. Update `src/example/hello/routes.clj`
+   - Call service to get data
+   - Pass data to view for rendering
+   - Wrap view output in HTTP response
+
+#### Phase 2: Apply Pattern to Other Routes
+- Goodbye routes (simple, no DB)
+- Static routes (if any logic exists)
+
+### Example Structure
+
+```clojure
+;; service.clj
+(ns example.hello.service
+  (:require [next.jdbc :as jdbc]))
+
+(defn get-planet-info [db]
+  (jdbc/execute-one! db ["SELECT 'earth' as planet"]))
+
+;; views.clj
+(ns example.hello.views
+  (:require [example.page-html.core :as page-html]))
+
+(defn hello-page [{:keys [planet]}]
+  (page-html/view
+    {:title "Wick"
+     :body [...]}))
+
+;; routes.clj
+(ns example.hello.routes
+  (:require [example.hello.service :as service]
+            [example.hello.views :as views]))
+
+(defn hello-handler [system _request]
+  (let [data (service/get-planet-info (:db system))]
+    {:status 200
+     :headers {"Content-Type" "text/html"}
+     :body (views/hello-page data)}))
+```
+
+### Benefits
+- **Testability**: Can test services with mock DB, views with pure data
+- **Reusability**: Services can be used by multiple routes or background jobs
+- **Maintainability**: Clear separation of concerns
+- **Flexibility**: Easy to add caching, logging, or change view technology
+
+### Testing Approach
+- **Service tests**: Use test database, verify data returned
+- **View tests**: Pure functions, test with sample data
+- **Route tests**: Mock service layer, verify HTTP responses
+
+## Testing Strategy and Information
 
 ## Testing Framework Setup
 - **Test Runner**: Kaocha (v1.91.1392) - configured in `tests.edn`
@@ -13,46 +92,6 @@
 - Existing tests:
   - `test/example/math_test.clj` - Basic unit test example
   - `test/example/page_html/core_test.clj` - Stimulus/Hiccup integration tests
-
-## Testing Todo List (Incremental Approach)
-
-### Phase 1: Basic Setup
-1. Verify test framework setup - Run existing tests with 'just test'
-
-### Phase 2: Simple Route Tests
-2. Add basic route handler tests for goodbye routes (simplest endpoint)
-3. Run tests and prompt for version control
-
-### Phase 3: Static Route Tests  
-4. Add route handler tests for static routes (favicon handling)
-5. Run tests and prompt for version control
-
-### Phase 4: Complex Route Tests
-6. Add route handler tests for hello routes (includes database interaction)
-7. Run tests and prompt for version control
-
-### Phase 5: Middleware Tests
-8. Add middleware tests for security headers and session handling
-9. Run tests and prompt for version control
-
-### Phase 6: System Integration Tests
-10. Add system integration tests for startup/shutdown lifecycle
-11. Run tests and prompt for version control
-
-### Phase 7: Background Jobs Tests
-12. Add background job processing tests
-13. Run tests and prompt for version control
-
-### Phase 8: Database Tests
-14. Add database migration and connection pool tests
-15. Run tests and prompt for version control
-
-### Phase 9: Error Handling Tests
-16. Add error handling tests (404s, exceptions)
-17. Run tests and prompt for version control
-
-### Phase 10: Coverage Review
-18. Review test coverage and identify any remaining gaps
 
 ## Key Modules Requiring Tests
 
@@ -106,3 +145,4 @@
 - Commit after each successful test addition
 - TestContainers provides real PostgreSQL for integration tests
 - Test system automatically handles database setup/teardown
+- to memorize
