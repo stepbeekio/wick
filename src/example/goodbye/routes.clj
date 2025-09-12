@@ -1,14 +1,11 @@
 (ns example.goodbye.routes
-  (:require [example.page-html.core :as page-html]
-            [hiccup2.core :as hiccup]))
+  (:require [example.goodbye.views :as views]))
 
 (defn goodbye-handler
   [_system _request]
   {:status 200
    :headers {"Content-Type" "text/html"}
-   :body (str
-          (hiccup/html
-           (page-html/view :body [:h1 "Goodbye, world"])))})
+   :body (views/goodbye-page)})
 
 (defn routes
   [system]
