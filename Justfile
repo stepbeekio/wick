@@ -19,6 +19,9 @@ lint:
 test:
     clojure -M:test
 
+test-e2e:
+    clojure -M:test --focus-meta playwright --reporter documentation
+
 outdated:
     clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version "RELEASE"}}}' -M -m antq.core
 
