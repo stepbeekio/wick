@@ -1,6 +1,5 @@
 (ns example.hello.views
-  (:require [example.page-html.core :as page-html]
-            [hiccup2.core :as hiccup]))
+  (:require [example.page-html.core :as page-html]))
 
 (defn hello-page
   "Renders the main hello page with the given data"
