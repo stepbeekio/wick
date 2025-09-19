@@ -1,4 +1,4 @@
-(ns example.playwright.navigation-test
+(ns example.playwright-navigation-test
   (:require [clojure.test :refer [deftest testing is]]
             [example.playwright.test-base :as base]))
 

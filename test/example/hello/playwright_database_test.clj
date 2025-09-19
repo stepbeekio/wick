@@ -1,4 +1,4 @@
-(ns example.playwright.database-interaction-test
+(ns example.hello.playwright-database-test
   (:require [clojure.test :refer [deftest testing is]]
             [example.playwright.pages.hello-page :as hello-page]
             [example.playwright.test-base :as base]

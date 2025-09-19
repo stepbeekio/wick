@@ -1,4 +1,4 @@
-(ns example.playwright.counter-working-test
+(ns example.counter.playwright-test
   (:require [clojure.test :refer [deftest testing is]]
             [example.playwright.test-base :as test-base])
   (:import [com.microsoft.playwright Page$NavigateOptions]
