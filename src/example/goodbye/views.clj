@@ -1,10 +1,10 @@
 (ns example.goodbye.views
-  (:require [example.page-html.core :as page-html]
-            [hiccup2.core :as hiccup]))
+  (:require [example.page-html.core :as page-html]))
 
 (defn goodbye-page
   "Renders the goodbye page"
   []
-  (str
-   (hiccup/html
-    (page-html/view :body [:h1 "Goodbye, world"]))))
+  (page-html/render
+   (page-html/view
+    {:title "Goodbye"
+     :body [:h1 "Goodbye, world"]})))

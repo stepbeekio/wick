@@ -13,7 +13,7 @@
             :content "width=device-width, initial-scale=1.0"}]
 
     [:script {:src "/assets/js/main.js"}]
-    [:link {:href "assets/css/main.css" :rel "stylesheet"}]]
+    [:link {:href "/assets/css/main.css" :rel "stylesheet"}]]
    [:body
     body]])
 
