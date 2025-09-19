@@ -4,11 +4,10 @@
             [example.routes :as routes]
             [next.jdbc.connection :as connection]
             [proletarian.worker :as worker]
-            [ring.adapter.jetty :as jetty]
+            [org.httpkit.server :as http-kit]
             [ring.middleware.session.cookie :as session-cookie])
   (:import (com.zaxxer.hikari HikariDataSource)
-           (io.github.cdimascio.dotenv Dotenv)
-           (org.eclipse.jetty.server Server)))
+           (io.github.cdimascio.dotenv Dotenv)))
 
 (set! *warn-on-reflection* true)
 
@@ -57,15 +56,14 @@
   [{::keys [env] :as system}]
   (let [handler (if (= (Dotenv/.get env "ENVIRONMENT") "development")
                   (partial #'routes/root-handler system)
-                  (routes/root-handler system))]
-    (jetty/run-jetty
-     handler
-     {:port  (Long/parseLong (Dotenv/.get env "PORT"))
-      :join? false})))
+                  (routes/root-handler system))
+        port (Long/parseLong (Dotenv/.get env "PORT"))]
+    (http-kit/run-server handler {:port port})))
 
 (defn stop-server
-  [server]
-  (Server/.stop server))
+  [stop-fn]
+  (when stop-fn
+    (stop-fn :timeout 100)))
 
 (defn start-system
   []

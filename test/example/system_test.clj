@@ -5,8 +5,7 @@
             [next.jdbc :as jdbc]
             [ring.middleware.session.memory :as memory])
   (:import (com.zaxxer.hikari HikariDataSource)
-           (io.github.cdimascio.dotenv Dotenv)
-           (org.eclipse.jetty.server Server)))
+           (io.github.cdimascio.dotenv Dotenv)))
 
 (deftest system-component-lifecycle-test
   (testing "Individual system components can start and stop"

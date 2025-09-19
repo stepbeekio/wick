@@ -1,7 +1,9 @@
 {:paths ["src" "res" "assets"]
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         ;; HTTP server
-        ring/ring {:mvn/version "1.13.0"}
+        http-kit/http-kit {:mvn/version "2.8.0"}
+        ring/ring-core {:mvn/version "1.13.0"}
+        ring/ring-codec {:mvn/version "1.2.0"}
         ;; Routing
         metosin/reitit-ring {:mvn/version "0.7.2"}
         ;; Logging Facade
