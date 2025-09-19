@@ -9,16 +9,16 @@
 
 (deftest system-component-lifecycle-test
   (testing "Individual system components can start and stop"
-    
+
     (testing "Environment component"
       (let [env (system/start-env)]
         (is (instance? Dotenv env))
         (is (string? (Dotenv/.get env "PORT" "3000")))))
-    
+
     (testing "Cookie store component"
       (let [cookie-store (system/start-cookie-store)]
         (is (satisfies? ring.middleware.session.store/SessionStore cookie-store))))
-    
+
     (testing "Database component with test database"
       (test-system/with-test-db
         (fn [db]
@@ -35,17 +35,17 @@
               system {::system/env env
                       ::system/cookie-store cookie-store
                       ::system/db test-db}]
-          
+
           (testing "System has required components"
             (is (::system/env system))
             (is (::system/cookie-store system))
             (is (::system/db system)))
-          
+
           (testing "Database connection works"
-            (let [result (jdbc/execute-one! (::system/db system) 
-                                           ["SELECT 'test' as value"])]
+            (let [result (jdbc/execute-one! (::system/db system)
+                                            ["SELECT 'test' as value"])]
               (is (= "test" (:value result)))))
-          
+
           ; Note: We don't stop the test-db as it's managed by with-test-db
           )))))
 
@@ -73,12 +73,12 @@
               system {::system/env env
                       ::system/cookie-store cookie-store
                       ::system/db test-db}]
-          
+
           (testing "Worker requires database"
             ; We can't fully test worker without a proper job queue setup
             ; but we can verify the database dependency exists
             (is (::system/db system)))
-          
+
           (testing "Server requires all components"
             ; We verify that the system has all components needed for server
             (is (::system/env system))

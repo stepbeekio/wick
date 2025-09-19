@@ -1,9 +1,9 @@
 (ns example.hello.routes-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
+            [clojure.test :refer [deftest testing is]]
             [example.hello.routes :as hello]
-            [example.test-system :as test-system]
             [example.system :as-alias system]
+            [example.test-system :as test-system]
             [ring.mock.request :as mock]))
 
 (deftest hello-handler-test

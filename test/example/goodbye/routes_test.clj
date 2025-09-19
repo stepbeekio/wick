@@ -1,6 +1,6 @@
 (ns example.goodbye.routes-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
+            [clojure.test :refer [deftest testing is]]
             [example.goodbye.routes :as goodbye]
             [ring.mock.request :as mock]))
 
@@ -22,5 +22,4 @@
       (is (= "/goodbye" (first (first routes))))
       (is (map? (second (first routes))))
       (is (contains? (second (first routes)) :get))
-      (is (fn? (get-in (second (first routes)) [:get :handler])))
-      )))
+      (is (fn? (get-in (second (first routes)) [:get :handler]))))))

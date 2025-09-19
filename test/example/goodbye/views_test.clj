@@ -1,6 +1,6 @@
 (ns example.goodbye.views-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
+            [clojure.test :refer [deftest testing is]]
             [example.goodbye.views :as views]))
 
 (deftest goodbye-page-test

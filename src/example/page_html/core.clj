@@ -3,7 +3,7 @@
             [hiccup.util :as hiccup-util]
             [hiccup2.core :as hiccup]))
 
-(defn view [& {:keys [body title]
+(defn view [& {:keys [body title head]
                :or {title "The Website"}}]
   [:html
    [:head
@@ -11,9 +11,11 @@
     [:title title]
     [:meta {:name "viewport"
             :content "width=device-width, initial-scale=1.0"}]
-
+    [:script {:type "module"
+              :src "https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.5/bundles/datastar.js"}]
     [:script {:src "/assets/js/main.js"}]
-    [:link {:href "/assets/css/main.css" :rel "stylesheet"}]]
+    [:link {:href "/assets/css/main.css" :rel "stylesheet"}]
+    head]
    [:body
     body]])
 

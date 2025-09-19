@@ -10,7 +10,6 @@
      :headers {"Content-Type" "text/html; charset=UTF-8"}
      :body (views/hello-page data)}))
 
-
 (defn routes
   [system]
   [["/" {:get {:handler (partial #'hello-handler system)}}]])

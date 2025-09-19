@@ -3,8 +3,8 @@
             [example.jobs :as jobs]
             [example.routes :as routes]
             [next.jdbc.connection :as connection]
-            [proletarian.worker :as worker]
             [org.httpkit.server :as http-kit]
+            [proletarian.worker :as worker]
             [ring.middleware.session.cookie :as session-cookie])
   (:import (com.zaxxer.hikari HikariDataSource)
            (io.github.cdimascio.dotenv Dotenv)))

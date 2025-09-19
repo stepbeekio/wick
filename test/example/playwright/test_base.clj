@@ -1,8 +1,8 @@
 (ns example.playwright.test-base
   (:require [clojure.test :refer [deftest is]]
-            [example.test-system :as test-system]
-            [example.system :as system]
             [example.playwright.config :as config]
+            [example.system :as system]
+            [example.test-system :as test-system]
             [ring.middleware.session.cookie :as session-cookie])
   (:import [com.microsoft.playwright Playwright BrowserType$LaunchOptions Page Page$NavigateOptions Page$ScreenshotOptions Browser BrowserContext]
            [com.microsoft.playwright.options WaitUntilState AriaRole]
@@ -67,7 +67,7 @@
             env-wrapper (reify io.github.cdimascio.dotenv.Dotenv
                           (get [_ key] (.getProperty test-env key))
                           (get [_ key default-val] (or (.getProperty test-env key) default-val)))
-            server (system/start-server (assoc system 
+            server (system/start-server (assoc system
                                                :example.system/env env-wrapper))
             system (assoc system :example.system/server server)
             base-url (str "http://localhost:" port)]
@@ -109,7 +109,7 @@
   ([page path]
    (let [url (str *base-url* path)]
      (.navigate page url (-> (Page$NavigateOptions.)
-                            (.setWaitUntil WaitUntilState/NETWORKIDLE))))))
+                             (.setWaitUntil WaitUntilState/NETWORKIDLE))))))
 
 (defn page-title
   ([]
@@ -151,7 +151,7 @@
    (screenshot *page* path))
   ([page path]
    (.screenshot page (-> (Page$ScreenshotOptions.)
-                        (.setPath (java.nio.file.Paths/get path (into-array String [])))))))
+                         (.setPath (java.nio.file.Paths/get path (into-array String [])))))))
 
 (defn evaluate-js
   "Evaluate JavaScript in the page context"

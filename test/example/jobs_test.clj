@@ -1,22 +1,22 @@
 (ns example.jobs-test
   (:require [clojure.test :refer [deftest testing is]]
             [example.jobs :as jobs]
-            [example.test-system :as test-system]
             [example.system :as-alias system]
+            [example.test-system :as test-system]
             [proletarian.protocols]
             [proletarian.worker :as worker]))
 
 (deftest json-serializer-test
   (testing "JSON serializer encodes and decodes correctly"
     (let [serializer jobs/json-serializer]
-      
+
       (testing "Simple data"
         (let [data {:foo "bar" :baz 123}
               encoded (proletarian.protocols/encode serializer data)
               decoded (proletarian.protocols/decode serializer encoded)]
           (is (string? encoded))
           (is (= data decoded))))
-      
+
       (testing "Nested data"
         (let [data {:user {:name "John" :age 30}
                     :items ["a" "b" "c"]}
@@ -24,7 +24,7 @@
               decoded (proletarian.protocols/decode serializer encoded)]
           (is (string? encoded))
           (is (= data decoded))))
-      
+
       (testing "Empty data"
         (let [data {}
               encoded (proletarian.protocols/encode serializer data)
@@ -57,7 +57,7 @@
       (is (thrown-with-msg? clojure.lang.ExceptionInfo
                             #"Unhandled Job Type"
                             (jobs/process-job system job-type payload)))))
-  
+
   (testing "Process job with handler executes handler"
     ; Mock a handler
     (with-redefs [jobs/handlers (fn [] {:test-job (fn [sys jt pl]

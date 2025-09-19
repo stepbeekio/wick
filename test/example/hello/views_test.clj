@@ -1,6 +1,6 @@
 (ns example.hello.views-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [clojure.string :as string]
+  (:require [clojure.string :as string]
+            [clojure.test :refer [deftest testing is]]
             [example.hello.views :as views]))
 
 (deftest hello-page-test
@@ -12,7 +12,7 @@
       (is (string/includes? result "mars"))
       (is (string/includes? result "Tech Stack"))
       (is (string/includes? result "Features"))))
-  
+
   (testing "hello-page includes all expected sections"
     (let [data {:planet "earth"}
           result (views/hello-page data)]

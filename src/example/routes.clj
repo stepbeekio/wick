@@ -1,5 +1,6 @@
 (ns example.routes
   (:require [clojure.tools.logging :as log]
+            [example.counter.routes :as counter-routes]
             [example.goodbye.routes :as goodbye-routes]
             [example.hello.routes :as hello-routes]
             [example.static.routes :as static-routes]
@@ -13,6 +14,7 @@
    (static-routes/routes system)
    (hello-routes/routes system)
    (goodbye-routes/routes system)
+   (counter-routes/routes system)
    [["/assets/*" (reitit-ring/create-resource-handler)]]])
 
 (comment
