@@ -1,8 +1,11 @@
 (ns example.routes
   (:require [clojure.tools.logging :as log]
+            [example.auth.routes :as auth-routes]
             [example.counter.routes :as counter-routes]
             [example.goodbye.routes :as goodbye-routes]
             [example.hello.routes :as hello-routes]
+            [example.middleware :as middleware]
+            [example.profile.routes :as profile-routes]
             [example.static.routes :as static-routes]
             [example.system :as-alias system]
             [hiccup2.core :as hiccup]
@@ -12,6 +15,8 @@
   [system]
   [""
    (static-routes/routes system)
+   (auth-routes/routes system)
+   (profile-routes/routes system)
    (hello-routes/routes system)
    (goodbye-routes/routes system)
    (counter-routes/routes system)
@@ -53,17 +58,29 @@
                      :class "block w-full bg-gray-800 hover:bg-gray-900 transition-colors duration-200 px-6 py-3 rounded-md font-medium text-white"}
                  "Return Home"]]]]]]))})
 
+(defn- apply-middleware
+  "Apply middleware stack to a handler"
+  [handler middleware-stack]
+  (reduce (fn [h mw]
+            (if (fn? mw)
+              (mw h)
+              h))
+          handler
+          (reverse middleware-stack)))
+
 (defn root-handler
   ([system request]
    ((root-handler system) request))
   ([system]
-   (let [handler (reitit-ring/ring-handler
-                  (reitit-ring/router
-                   (routes system))
-                  #'not-found-handler)]
+   (let [base-handler (reitit-ring/ring-handler
+                       (reitit-ring/router
+                        (routes system))
+                       #'not-found-handler)
+         middleware-stack (middleware/standard-html-route-middleware system)
+         wrapped-handler (apply-middleware base-handler middleware-stack)]
      (fn root-handler [request]
        (log/info (str (:request-method request) " - " (:uri request)))
-       (handler request)))))
+       (wrapped-handler request)))))
 
 
 

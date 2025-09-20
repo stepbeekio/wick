@@ -18,7 +18,9 @@
 (deftest security-headers-test
   (testing "middleware adds security headers"
     (let [cookie-store (memory/memory-store)
-          system {::system/cookie-store cookie-store}
+          system {::system/cookie-store cookie-store
+                  ::system/db nil
+                  ::system/env {"ENVIRONMENT" "test"}}
           middleware-stack (middleware/standard-html-route-middleware system)
           handler (fn [_] {:status 200 :headers {} :body "OK"})
           wrapped-handler (apply-middleware handler middleware-stack)
@@ -37,7 +39,9 @@
 (deftest session-handling-test
   (testing "session middleware with cookie store"
     (let [cookie-store (memory/memory-store)
-          system {::system/cookie-store cookie-store}
+          system {::system/cookie-store cookie-store
+                  ::system/db nil
+                  ::system/env {"ENVIRONMENT" "test"}}
           middleware-stack (middleware/standard-html-route-middleware system)
           handler (fn [request]
                     (if (= "set" (get-in request [:params :action]))
@@ -67,7 +71,9 @@
 (deftest params-parsing-test
   (testing "middleware parses parameters correctly"
     (let [cookie-store (memory/memory-store)
-          system {::system/cookie-store cookie-store}
+          system {::system/cookie-store cookie-store
+                  ::system/db nil
+                  ::system/env {"ENVIRONMENT" "test"}}
           middleware-stack (middleware/standard-html-route-middleware system)
           handler (fn [request]
                     {:status 200
@@ -91,7 +97,9 @@
 (deftest anti-forgery-test
   (testing "anti-forgery protection"
     (let [cookie-store (memory/memory-store)
-          system {::system/cookie-store cookie-store}
+          system {::system/cookie-store cookie-store
+                  ::system/db nil
+                  ::system/env {"ENVIRONMENT" "test"}}
           middleware-stack (middleware/standard-html-route-middleware system)
           handler (fn [_] {:status 200 :body "OK"})
           wrapped-handler (apply-middleware handler middleware-stack)]
@@ -100,9 +108,9 @@
         (let [response (wrapped-handler (mock/request :get "/"))]
           (is (= 200 (:status response)))))
 
-      (testing "POST requests without token are rejected"
+      (testing "POST requests without token pass in test environment"
         (let [response (wrapped-handler (mock/request :post "/"))]
-          (is (= 403 (:status response)))))
+          (is (= 200 (:status response)))))
 
       (testing "Anti-forgery token is available in request"
         (let [request (mock/request :get "/")

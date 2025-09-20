@@ -109,7 +109,7 @@
   ([page path]
    (let [url (str *base-url* path)]
      (.navigate page url (-> (Page$NavigateOptions.)
-                             (.setWaitUntil WaitUntilState/NETWORKIDLE))))))
+                             (.setWaitUntil WaitUntilState/DOMCONTENTLOADED))))))
 
 (defn page-title
   ([]
@@ -194,3 +194,19 @@
    (count-elements *page* selector))
   ([page selector]
    (.count (.locator page selector))))
+
+(defn get-current-path
+  "Get the current URL path without the domain"
+  ([]
+   (get-current-path *page*))
+  ([page]
+   (let [url (.url page)
+         uri (java.net.URI. url)]
+     (.getPath uri))))
+
+(defn fill-input
+  "Alias for fill - fill a form input field"
+  ([selector value]
+   (fill selector value))
+  ([page selector value]
+   (fill page selector value)))
