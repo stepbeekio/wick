@@ -1,148 +1,177 @@
-# Wick Project - Development Guidelines
+# CLAUDE.md
 
-## Route Refactoring Plan - Separation of Concerns
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-### Current State
-- Database queries are directly embedded in route handlers (e.g., `hello/routes.clj`)
-- View rendering logic (Hiccup templates) is mixed with route handling
-- This makes testing difficult and violates single responsibility principle
+# Wick - Clojure Web Application
 
-### Target Architecture
-Three-layer separation:
-1. **Routes Layer** - HTTP request/response handling only
-2. **Service Layer** - Business logic and database access
-3. **View Layer** - Hiccup template rendering
+A Clojure web application template with full-stack capabilities including authentication, background jobs, and reactive frontend using Datastar.
 
-### Refactoring Strategy
+## Build & Development Commands
 
-#### Phase 1: Hello Routes (Most Complex)
-1. Create `src/example/hello/service.clj`
-   - Extract database query logic
-   - Return data maps, not HTTP responses
-   - Example: `(get-planet-info db)` returns `{:planet "earth"}`
-
-2. Create `src/example/hello/views.clj`
-   - Extract all Hiccup template logic
-   - Pure functions that take data and return Hiccup
-   - Example: `(render-hello-page {:planet "earth"})` returns Hiccup structure
-
-3. Update `src/example/hello/routes.clj`
-   - Call service to get data
-   - Pass data to view for rendering
-   - Wrap view output in HTTP response
-
-#### Phase 2: Apply Pattern to Other Routes
-- Goodbye routes (simple, no DB)
-- Static routes (if any logic exists)
-
-### Example Structure
-
-```clojure
-;; service.clj
-(ns example.hello.service
-  (:require [next.jdbc :as jdbc]))
-
-(defn get-planet-info [db]
-  (jdbc/execute-one! db ["SELECT 'earth' as planet"]))
-
-;; views.clj
-(ns example.hello.views
-  (:require [example.page-html.core :as page-html]))
-
-(defn hello-page [{:keys [planet]}]
-  (page-html/view
-    {:title "Wick"
-     :body [...]}))
-
-;; routes.clj
-(ns example.hello.routes
-  (:require [example.hello.service :as service]
-            [example.hello.views :as views]))
-
-(defn hello-handler [system _request]
-  (let [data (service/get-planet-info (:db system))]
-    {:status 200
-     :headers {"Content-Type" "text/html"}
-     :body (views/hello-page data)}))
+### Core Development Commands
+```bash
+just run                    # Run the application
+just test                   # Run all tests with Kaocha
+just test-e2e              # Run Playwright end-to-end tests
+just format                # Format code with cljfmt
+just lint                  # Lint code with clj-kondo
+just build-fe              # Build frontend assets (CSS + ClojureScript)
+just outdated              # Check for outdated dependencies
 ```
 
-### Benefits
-- **Testability**: Can test services with mock DB, views with pure data
-- **Reusability**: Services can be used by multiple routes or background jobs
-- **Maintainability**: Clear separation of concerns
-- **Flexibility**: Easy to add caching, logging, or change view technology
+### Test Commands
+```bash
+# Run all tests
+just test
 
-### Testing Approach
-- **Service tests**: Use test database, verify data returned
-- **View tests**: Pure functions, test with sample data
-- **Route tests**: Mock service layer, verify HTTP responses
+# Run specific test namespace
+clojure -M:test -m kaocha.runner --focus example.namespace-test
 
-## Testing Strategy and Information
+# Run tests in watch mode
+clojure -M:test -m kaocha.runner --watch
 
-## Testing Framework Setup
-- **Test Runner**: Kaocha (v1.91.1392) - configured in `tests.edn`
-- **Database Testing**: TestContainers with PostgreSQL
-- **Test Command**: `just test`
-- **Test Aliases**: `:dev` and `:test` in `deps.edn`
+# Run with specific Timbre log level (for debugging auth tests)
+TIMBRE_LEVEL=:debug clojure -M:test --focus example.auth.service-test
 
-## Existing Test Infrastructure
-- Test system utilities: `test/example/test_system.clj`
-- Database test setup with automatic creation/teardown
-- Migrations run automatically in test environment
-- Existing tests:
-  - `test/example/math_test.clj` - Basic unit test example
-  - `test/example/page_html/core_test.clj` - Stimulus/Hiccup integration tests
+# End-to-end tests
+DEBUG=1 just test-e2e
+```
 
-## Key Modules Requiring Tests
+### Development REPL Workflow
+1. Start dependencies: `docker-compose up -d`
+2. Start REPL: `clojure -M:dev` or use editor integration
+3. In REPL, evaluate `dev/user.clj`:
+   - `(start-system!)` - Starts server, shadow-cljs, CSS watcher, and Docker dependencies
+   - `(stop-system!)` - Stops the system
+   - `(restart-system!)` - Restarts everything
+   - `(db)` - Access database connection
+   - `(env)` - Access environment configuration
 
-### Backend (Clojure)
-- **System** (`src/example/system.clj`) - Lifecycle, DB connections, configuration
-- **Routes** (`src/example/routes.clj`) - Root handler, routing logic, 404 handling
-- **Route Handlers**:
-  - Hello routes (`src/example/hello/routes.clj`) - Complex with DB
-  - Goodbye routes (`src/example/goodbye/routes.clj`) - Simple
-  - Static routes (`src/example/static/routes.clj`) - Favicon
-- **Middleware** (`src/example/middleware.clj`) - Security, sessions, CSRF
-- **Jobs** (`src/example/jobs.clj`) - Background processing with Proletarian
-- **Database** (`src/example/database/migrations.clj`) - Flyway migrations
+### Frontend Development
+- **CSS**: Tailwind v4 with automatic rebuilding via `(watch-css)` in REPL
+- **ClojureScript**: Shadow-cljs with Stimulus controllers
+- **Build command**: `npm run css:build && npx shadow-cljs release frontend`
+- **Output**: `assets/public/js/main.js` and `assets/public/css/main.css`
 
-### Frontend (ClojureScript)
-- App initialization (`src/example/frontend/app.cljs`)
-- Stimulus controllers and integration
+## Architecture Overview
 
-## Test Writing Patterns
+### System Components (`src/example/system.clj`)
+The application uses a component-based architecture with lifecycle management:
+- **Environment**: Dotenv configuration loader
+- **Database**: HikariCP connection pool with PostgreSQL
+- **Worker**: Proletarian background job processor
+- **Server**: HTTP-Kit web server
+- **Cookie Store**: Session management
 
-### Basic Route Test Structure
+### Three-Layer Architecture Pattern
+The codebase follows a separation of concerns pattern:
+
+1. **Routes Layer** (`*/routes.clj`)
+   - HTTP request/response handling
+   - Middleware application
+   - Response formatting
+
+2. **Service Layer** (`*/service.clj`)
+   - Business logic
+   - Database queries
+   - Authentication logic
+   - Returns data maps (not HTTP responses)
+
+3. **Views Layer** (`*/views.clj`)
+   - Hiccup template rendering
+   - Pure functions taking data maps
+   - Datastar SSE integration
+
+### Key Modules
+
+#### Authentication System (`src/example/auth/`)
+- **Service**: User registration, login, password hashing (buddy-hashers)
+- **Middleware**: Session-based authentication checks
+- **Views**: Login, signup, logout forms
+- **Routes**: Auth endpoints with CSRF protection
+- **Utils**: Helper functions for auth checks
+
+#### Routes & Middleware (`src/example/`)
+- **routes.clj**: Main router using Reitit, 404 handling
+- **middleware.clj**: Security headers, CSRF, sessions, authentication
+
+#### Database (`res/db/migration/`)
+- Flyway migrations (auto-run on startup)
+- V01: Core schema
+- V02: Proletarian job queue tables
+- V03: Authentication tables (users, sessions)
+
+#### Background Jobs (`src/example/jobs.clj`)
+- Proletarian worker configuration
+- JSON serialization for job payloads
+- Automatic retry with exponential backoff
+
+#### Frontend (`src/example/frontend/`)
+- **app.cljs**: Main entry point, Stimulus initialization
+- **stimulus/**: Controllers for interactive components
+- Datastar integration for reactive SSE updates
+
+### Testing Infrastructure
+
+#### Test System (`test/example/test_system.clj`)
+- TestContainers PostgreSQL for integration tests
+- Automatic database creation/teardown
+- Migrations run in test environment
+- Mock system components
+
+#### Test Patterns
 ```clojure
-(ns example.routes-test
-  (:require [clojure.test :refer [deftest testing is]]
-            [example.test-system :as test-system]
-            [ring.mock.request :as mock]))
-
+;; Route test with mock system
 (deftest route-test
   (test-system/with-system [sys (test-system/create-test-system)]
     (let [handler (get-handler sys)
           response (handler (mock/request :get "/path"))]
       (is (= 200 (:status response))))))
-```
 
-### Database Integration Test Pattern
-```clojure
+;; Database integration test
 (deftest db-test
   (test-system/with-database [db]
     ; Test with isolated database
     ))
 ```
 
-## Important Commands
-- Run tests: `just test`
-- Run specific test: `clojure -M:test -m kaocha.runner --focus example.namespace-test`
-- Watch mode: `clojure -M:test -m kaocha.runner --watch`
+## Important Implementation Notes
 
-## Notes
-- Each test phase should be small and focused
-- Run tests after each addition to catch issues early
-- Commit after each successful test addition
-- TestContainers provides real PostgreSQL for integration tests
-- Test system automatically handles database setup/teardown
-- to memorize
+### Route Refactoring Strategy
+When refactoring routes, follow this pattern:
+1. Extract database logic to service namespace
+2. Extract view rendering to views namespace
+3. Keep route handler thin - only orchestration
+
+### Authentication
+- Session-based (cookie store)
+- Passwords hashed with buddy-hashers (bcrypt+sha512)
+- CSRF protection on all POST routes
+- Auth middleware available for protected routes
+
+### Database Access
+- Use next.jdbc for queries
+- HoneySQL for dynamic query generation
+- Connection pool managed by HikariCP
+- TestContainers for test isolation
+
+### Frontend Integration
+- Stimulus controllers for JavaScript behavior
+- Datastar for server-sent events (SSE)
+- Hiccup for HTML generation
+- Tailwind CSS v4 for styling
+
+## Environment Configuration
+Uses `.env` file with Dotenv:
+- `POSTGRES_URL`, `POSTGRES_USERNAME`, `POSTGRES_PASSWORD`
+- `PORT` - Server port
+- `ENVIRONMENT` - development/production
+- Session keys and other secrets
+
+## Development Tips
+- Always run `just lint` and `just format` before committing
+- Use `test-system/with-system` for integration tests
+- Keep services pure - no HTTP concerns
+- Views should be pure functions
+- Use REPL-driven development with `dev/user.clj`
+- CSS changes trigger automatic rebuild in development

@@ -15,7 +15,7 @@
   (test-base/with-playwright-system
     (testing "Counter page loads correctly"
       (navigate-to-counter "/counter")
-      (Thread/sleep 500) ; Give SSE time to connect
+      (test-base/wait-for-selector "#counter-value")
       (is (= "Counter - Datastar Demo" (test-base/page-title)))
       (is (test-base/visible? "h1"))
       (is (= "Datastar Counter" (test-base/text-content "h1"))))
@@ -24,43 +24,33 @@
       (is (= "0" (test-base/text-content "#counter-value"))))
 
     (testing "Increment button increases counter"
-      (test-base/click "[data-on-click=\"@post('/counter/increment')\"]")
-      (Thread/sleep 200) ; Wait for SSE update
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/increment')\"]" "#counter-value" "1")
       (is (= "1" (test-base/text-content "#counter-value")))
 
-      (test-base/click "[data-on-click=\"@post('/counter/increment')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/increment')\"]" "#counter-value" "2")
       (is (= "2" (test-base/text-content "#counter-value"))))
 
     (testing "Decrement button decreases counter"
-      (test-base/click "[data-on-click=\"@post('/counter/decrement')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/decrement')\"]" "#counter-value" "1")
       (is (= "1" (test-base/text-content "#counter-value")))
 
-      (test-base/click "[data-on-click=\"@post('/counter/decrement')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/decrement')\"]" "#counter-value" "0")
       (is (= "0" (test-base/text-content "#counter-value"))))
 
     (testing "Reset button resets counter to 0"
       ; First increment a few times
-      (test-base/click "[data-on-click=\"@post('/counter/increment')\"]")
-      (Thread/sleep 200)
-      (test-base/click "[data-on-click=\"@post('/counter/increment')\"]")
-      (Thread/sleep 200)
-      (test-base/click "[data-on-click=\"@post('/counter/increment')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/increment')\"]" "#counter-value" "1")
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/increment')\"]" "#counter-value" "2")
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/increment')\"]" "#counter-value" "3")
       (is (= "3" (test-base/text-content "#counter-value")))
 
       ; Now reset
-      (test-base/click "[data-on-click=\"@post('/counter/reset')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/reset')\"]" "#counter-value" "0")
       (is (= "0" (test-base/text-content "#counter-value"))))
 
     (testing "Counter can go negative"
-      (test-base/click "[data-on-click=\"@post('/counter/decrement')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/decrement')\"]" "#counter-value" "-1")
       (is (= "-1" (test-base/text-content "#counter-value")))
 
-      (test-base/click "[data-on-click=\"@post('/counter/decrement')\"]")
-      (Thread/sleep 200)
+      (test-base/click-and-wait-for-text "[data-on-click=\"@post('/counter/decrement')\"]" "#counter-value" "-2")
       (is (= "-2" (test-base/text-content "#counter-value"))))))

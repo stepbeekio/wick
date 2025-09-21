@@ -4,8 +4,8 @@
             [example.system :as system]
             [example.test-system :as test-system]
             [ring.middleware.session.cookie :as session-cookie])
-  (:import [com.microsoft.playwright Playwright BrowserType$LaunchOptions Page Page$NavigateOptions Page$ScreenshotOptions Browser BrowserContext]
-           [com.microsoft.playwright.options WaitUntilState AriaRole]
+  (:import [com.microsoft.playwright Playwright BrowserType$LaunchOptions Page Page$NavigateOptions Page$ScreenshotOptions Browser BrowserContext Locator$WaitForOptions]
+           [com.microsoft.playwright.options WaitUntilState AriaRole WaitForSelectorState]
            [io.github.cdimascio.dotenv Dotenv]))
 
 (def ^:dynamic *playwright* nil)
@@ -210,3 +210,30 @@
    (fill selector value))
   ([page selector value]
    (fill page selector value)))
+
+(defn wait-for-text
+  "Wait for an element to contain specific text content"
+  ([selector expected-text]
+   (wait-for-text *page* selector expected-text))
+  ([page selector expected-text]
+   (wait-for-text page selector expected-text {}))
+  ([page selector expected-text options]
+   (let [timeout (get options :timeout 5000)
+         locator (.locator page selector)]
+     (.waitFor locator (-> (com.microsoft.playwright.Locator$WaitForOptions.)
+                           (.setTimeout timeout)
+                           (.setState com.microsoft.playwright.options.WaitForSelectorState/VISIBLE)))
+     (loop [elapsed 0]
+       (let [current-text (.textContent locator)]
+         (if (or (= current-text expected-text) (>= elapsed timeout))
+           (= current-text expected-text)
+           (do (Thread/sleep 100)
+               (recur (+ elapsed 100)))))))))
+
+(defn click-and-wait-for-text
+  "Click an element and wait for text to change in another element"
+  ([click-selector text-selector expected-text]
+   (click-and-wait-for-text *page* click-selector text-selector expected-text))
+  ([page click-selector text-selector expected-text]
+   (click page click-selector)
+   (wait-for-text page text-selector expected-text)))
