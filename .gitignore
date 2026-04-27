@@ -6,5 +6,9 @@ data
 .shadow-cljs
 node_modules
 assets
-
+.clj-kondo/imports
+.DS_Store
+.nrepl-port
+mcp.log
+.lsp
 target
