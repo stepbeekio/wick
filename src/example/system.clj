@@ -54,9 +54,7 @@
 
 (defn start-server
   [{::keys [env] :as system}]
-  (let [handler (if (= (Dotenv/.get env "ENVIRONMENT") "development")
-                  (partial #'routes/root-handler system)
-                  (routes/root-handler system))
+  (let [handler (routes/root-handler system)
         port (Long/parseLong (Dotenv/.get env "PORT"))]
     (http-kit/run-server handler {:port port})))
 

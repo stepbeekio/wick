@@ -1,23 +1,28 @@
 (ns user
-  (:require [clojure.java.shell :refer [sh]]
-            [clojure.tools.logging :as log]
-            [example.routes :as routes]
-            [example.system :as system]
-            [nextjournal.beholder :as beholder]
-            [shadow.cljs.devtools.api :as shadow]
-            [shadow.cljs.devtools.server :as shadow-server])
-  (:import [java.io BufferedReader InputStreamReader]))
+  (:require
+   [clojure.java.shell :refer [sh]]
+   [example.routes :as routes]
+   [example.system :as system]
+   [nextjournal.beholder :as beholder]
+   [shadow.cljs.devtools.api :as shadow]
+   [shadow.cljs.devtools.server :as shadow-server])
+  (:import
+   [java.io BufferedReader InputStreamReader]))
 
 ;; CSS building functionality
 (defonce watch-state (atom nil))
 
-(defn build-css! []
-  "Builds CSS using NPM on the command line"
+(defn build-css!
+  "Builds CSS using NPM on the command line" []
   (let [css-result (sh "npm" "run" "css:build")]
     (tap> css-result)))
 
-(defn watch-css []
+(defn watch-css
   "Watches for any file change and runs the tailwind build as a result. The downside to this approach is that sending a single function to the REPL might result in tailwind build not being triggered. Maybe there's something that could be a result of emacs buffer files that could help here?"
+  []
+  (when @watch-state
+    (beholder/stop @watch-state)
+    (reset! watch-state nil))
   (when @watch-state
     (beholder/stop @watch-state)
     (reset! watch-state nil))
@@ -59,6 +64,7 @@
   (if system
     (println "Already Started")
     (do
+      (println "Starting again")
       (shadow-server/start!)
       (shadow/watch :frontend)
       (run-docker-compose "up" "-d")
@@ -69,6 +75,7 @@
   []
   (when system
     (system/stop-system system)
+    (shadow-server/stop!)
     (alter-var-root #'system (constantly nil))))
 
 (defn restart-system!
@@ -76,22 +83,11 @@
   (stop-system!)
   (start-system!))
 
-(defn server
-  []
-  (::system/server system))
+(defn switch-to-cljs []
+  (shadow/nrepl-select :frontend))
 
-(defn db
-  []
-  (::system/db system))
-
-(defn env
-  []
-  (::system/env system))
-
-(defn cookie-store
-  []
-  (::system/cookie-store system))
-
+(comment (stop-system!))
 (comment (restart-system!))
 (comment (identity @watch-state))
 (comment (routes/routes system))
+(comment (switch-to-cljs))

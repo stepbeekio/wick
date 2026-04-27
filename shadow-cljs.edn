@@ -1,9 +1,9 @@
 {:deps true
+ :nrepl false
+ :socket-repl false
  :builds
  {:frontend
   {:target :browser
    :modules {:main {:init-fn example.frontend.app/init}}
-   :devtools {:watch-dir "public"}
    :output-dir "assets/public/js"
-   :asset-path "/assets/js"
-   }}}
+   :asset-path "/assets/js"}}}

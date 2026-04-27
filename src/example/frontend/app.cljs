@@ -4,3 +4,5 @@
 (defn init []
   (stimulus/init)
   (println "With stimulus"))
+
+(js/alert "Hello There!")

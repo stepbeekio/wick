@@ -69,18 +69,16 @@
           (reverse middleware-stack)))
 
 (defn root-handler
-  ([system request]
-   ((root-handler system) request))
-  ([system]
-   (let [base-handler (reitit-ring/ring-handler
-                       (reitit-ring/router
-                        (routes system))
-                       #'not-found-handler)
-         middleware-stack (middleware/standard-html-route-middleware system)
-         wrapped-handler (apply-middleware base-handler middleware-stack)]
-     (fn root-handler [request]
-       (log/info (str (:request-method request) " - " (:uri request)))
-       (wrapped-handler request)))))
+  [system]
+  (let [base-handler (reitit-ring/ring-handler
+                      (reitit-ring/router
+                       (routes system))
+                      #'not-found-handler)
+        middleware-stack (middleware/standard-html-route-middleware system)
+        wrapped-handler (apply-middleware base-handler middleware-stack)]
+    (fn root-handler [request]
+      (log/info (str (:request-method request) " - " (:uri request)))
+      (wrapped-handler request))))
 
 
 
